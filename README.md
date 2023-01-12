@@ -7,3 +7,5 @@ sudo su - postgres </br>
 
 </br>
 \i /home/sreemanti/Desktop/COL362/data/jmhvhjhj.sql
+
+COPY table_name FROM '/home/......csv'  DELIMITER ',' CSV HEADER;
