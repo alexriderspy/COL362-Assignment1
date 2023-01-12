@@ -6,4 +6,4 @@ sudo su - postgres </br>
 /usr/local/pgsql/bin/psql postgres </br>
 
 </br>
-\i path_to_sql.sql
+\i /home/sreemanti/Desktop/COL362/data/jmhvhjhj.sql
