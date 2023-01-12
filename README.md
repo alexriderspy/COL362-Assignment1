@@ -9,3 +9,5 @@ sudo su - postgres </br>
 \i /home/sreemanti/Desktop/COL362/data/jmhvhjhj.sql
 
 COPY table_name FROM '/home/......csv'  DELIMITER ',' CSV HEADER;
+
+check foreign key constraint for uploading csv files
