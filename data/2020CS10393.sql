@@ -1,3 +1,4 @@
+--1--
 SELECT
     tournament_id,
     tournament_name,
@@ -8,13 +9,18 @@ FROM
 WHERE
     host_country = winner;
 
+--2--
 SELECT
-    player_id, family_name, given_name, count_tournaments
+    player_id,
+    family_name,
+    given_name,
+    count_tournaments
 FROM
     Players
 WHERE
     count_tournaments >= 4;
 
+--3--
 SELECT
     COUNT(*) as num_matches
 FROM
@@ -27,6 +33,7 @@ WHERE
     Teams.team_name = 'Croatia'
     AND Matches.draw = 't';
 
+--4--
 SELECT
     stadium_name,
     city_name,
@@ -43,6 +50,7 @@ FROM
             AND stage_name = 'final'
     ) AS t ON Stadiums.stadium_id = t.stadium_id;
 
+--5--
 SELECT
     count (*) AS num_goals
 FROM
@@ -52,42 +60,84 @@ FROM
     AND given_name = 'Cristiano'
     AND own_goal = 'f';
 
+--6--
 SELECT
-    players.player_id,
-    players.family_name,
-    players.given_name,
-    count(*) AS num_goals
+    tb.player_id,
+    tb.family_name,
+    tb.given_name,
+    max(t) AS num_goals
 FROM
-    players
-    JOIN (
-        SELECT
-            *
+    (
+        select
+            players.player_id,
+            players.family_name,
+            players.given_name,
+            count(*) AS t
         FROM
-            goals
+            players
             JOIN (
                 SELECT
                     *
                 FROM
-                    matches
-                    JOIN tournaments ON tournaments.tournament_id = matches.tournament_id
-                    AND year >= 2002
-                    AND year <= 2018
-            ) AS t1 ON goals.match_id = t1.match_id
-            AND goals.own_goal = 'f'
-    ) AS t2 ON t2.player_id = players.player_id
+                    goals
+                    JOIN (
+                        SELECT
+                            *
+                        FROM
+                            matches
+                            JOIN tournaments ON tournaments.tournament_id = matches.tournament_id
+                            AND year >= 2002
+                            AND year <= 2018
+                    ) AS t1 ON goals.match_id = t1.match_id
+                    AND goals.own_goal = 'f'
+            ) AS t2 ON t2.player_id = players.player_id
+        group by
+            players.player_id,
+            players.family_name,
+            players.given_name
+    ) as tb
+where
+    t = (
+        select
+            max(t)
+        from
+            (
+                select
+                    count(*) as t
+                FROM
+                    players
+                    JOIN (
+                        SELECT
+                            *
+                        FROM
+                            goals
+                            JOIN (
+                                SELECT
+                                    *
+                                FROM
+                                    matches
+                                    JOIN tournaments ON tournaments.tournament_id = matches.tournament_id
+                                    AND year >= 2002
+                                    AND year <= 2018
+                            ) AS t1 ON goals.match_id = t1.match_id
+                            AND goals.own_goal = 'f'
+                    ) AS t2 ON t2.player_id = players.player_id
+                group by
+                    players.player_id,
+                    players.family_name,
+                    players.given_name
+            ) as q
+    )
 group by
-    players.player_id,
-    players.family_name,
-    players.given_name
-order by
-    num_goals desc
-limit
-    1;
+    tb.player_id,
+    tb.family_name,
+    tb.given_name;
 
+--7--
 select
     teams.team_id,
     team_name,
-    count(*) as num_self_goals
+    max(t) as num_self_goals
 FROM
     teams
     join goals on goals.player_team_id = teams.team_id
@@ -106,8 +156,31 @@ where
             join tournaments t2 on t2.tournament_id = matches.tournament_id
             and t2.year >= t1.year
     )
+    and t = (
+        select
+            max(t)
+        from
+            (
+                SELECT
+                    goals.player_team_id,
+                    teams.team_name,
+                    count(goals.player_team_id) as t
+                from
+                    goals
+                    join teams on teams.team_id = goals.player_team_id
+                    join matches on matches.match_id = goals.match_id
+                    join tournaments on tournaments.tournament_id = matches.tournament_id
+                where
+                    own_goal = true
+                    and tournaments.year >= 2010
+                group by
+                    teams.team_id,
+                    goals.player_team_id,
+                    teams.team_name
+                order by
+                    player_team_id
+            ) as q
+    )
 group by
     teams.team_id,
-    team_name
-order by
-    num_self_goals desc;
+    team_name;
