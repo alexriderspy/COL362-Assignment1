@@ -126,7 +126,7 @@ where
                     players.player_id,
                     players.family_name,
                     players.given_name
-            ) as q
+            ) as p
     )
 group by
     tb.player_id,
@@ -135,52 +135,48 @@ group by
 
 --7--
 select
-    teams.team_id,
-    team_name,
+    tb.team_id as team_id,
+    tb.team_name as team_name,
     max(t) as num_self_goals
-FROM
-    teams
-    join goals on goals.player_team_id = teams.team_id
-    and goals.own_goal = 't'
-    join matches on matches.match_id = goals.match_id
-    join tournaments t1 on t1.tournament_id = matches.tournament_id
-where
-    2 = (
-        select
-            count(distinct(year))
+from
+    (
+        SELECT
+            teams.team_id,
+            teams.team_name,
+            count(teams.team_id) as t
         from
             teams
-            join goals on goals.player_team_id = teams.team_id
-            and goals.own_goal = 't'
+            join goals on teams.team_id = goals.player_team_id
             join matches on matches.match_id = goals.match_id
-            join tournaments t2 on t2.tournament_id = matches.tournament_id
-            and t2.year >= t1.year
-    )
-    and t = (
+            join tournaments on tournaments.tournament_id = matches.tournament_id
+        where
+            own_goal = 't'
+            and tournaments.year >= 2010
+        group by
+            teams.team_id,
+            teams.team_name
+    ) as tb
+where
+    t = (
         select
             max(t)
         from
             (
                 SELECT
-                    goals.player_team_id,
-                    teams.team_name,
-                    count(goals.player_team_id) as t
+                    count(teams.team_id) as t
                 from
-                    goals
-                    join teams on teams.team_id = goals.player_team_id
+                    teams
+                    join goals on teams.team_id = goals.player_team_id
                     join matches on matches.match_id = goals.match_id
                     join tournaments on tournaments.tournament_id = matches.tournament_id
                 where
-                    own_goal = true
+                    own_goal = 't'
                     and tournaments.year >= 2010
                 group by
                     teams.team_id,
-                    goals.player_team_id,
                     teams.team_name
-                order by
-                    player_team_id
-            ) as q
+            ) as p
     )
 group by
-    teams.team_id,
-    team_name;
+    tb.team_id,
+    tb.team_name;
