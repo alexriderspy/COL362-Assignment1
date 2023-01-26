@@ -1,5 +1,3 @@
-
-
 select avg(t.salary) from (
 select
     distinct salaries.yearid,
@@ -7,5 +5,5 @@ select
     salaries.playerid
 from
     salaries
-    join batting on salaries.playerid = batting.playerid    
+    join pitching on salaries.playerid = pitching.playerid    
 ) as t;
