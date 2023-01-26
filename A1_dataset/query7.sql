@@ -15,12 +15,14 @@ from
             join (
                 select
                     teamid,
+                    name,
                     sum(w) as s
                 from
                     teams
                 group by
-                    teamid
-            ) as t on t.teamid = teams.teamid
+                    teamid,
+                    name
+            ) as t on t.teamid = teams.teamid and t.name = teams.name
         where
             t.s >= 20
         order by

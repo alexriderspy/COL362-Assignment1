@@ -1,27 +1,48 @@
 select
-    teams.teamid,
-    teams.name as teamname,
-    salaries.yearid as seasonid,
-    people.playerid,
-    namefirst as player_firstname,
-    namelast as player_lastname,
-    max(salary) as salary
+    t.teamid,
+    t.name as teamname,
+    s.seasonid,
+    p.playerid,
+    p.namefirst as player_firstname,
+    p.namelast as player_lastname,
+    s.salary
 from
-    salaries
-    join people on people.playerid = salaries.playerid
-    join teams on teams.teamid = salaries.teamid
-group by
-    teams.teamid,
-    teamname,
-    seasonid,
-    people.playerid,
-    player_firstname,
-    player_lastname
-order by
-    teams.teamid asc,
-    teamname asc,
-    seasonid asc,
-    people.playerid asc,
-    player_firstname asc,
-    player_lastname asc,
-    salary desc;
+    (
+        select
+            teamid,
+            yearid as seasonid,
+            max(salary) as salary
+        from
+            salaries
+        group by
+            teamid,
+            seasonid
+    ) as s
+    join salaries on salaries.salary = s.salary
+    and salaries.teamid = s.teamid
+    and salaries.yearid = s.seasonid
+    join (
+        select
+            distinct playerid,
+            namefirst,
+            namelast
+        from
+            people
+    ) as p on p.playerid = salaries.playerid
+    join (
+        select
+            distinct teamid,
+            name,
+            yearid 
+        from
+            teams
+    ) as t on t.teamid = salaries.teamid and t.yearid = salaries.yearid 
+    order by
+        t.teamid asc,
+        teamname asc,
+        s.seasonid asc,
+        p.playerid asc,
+        player_firstname asc,
+        player_lastname asc,
+        s.salary desc
+;
