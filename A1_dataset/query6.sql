@@ -1,5 +1,6 @@
 select
     distinct teams.teamid,
+    teams.name as teamname,
     f.franchname,
     max(w) as num_wins
 from
@@ -9,8 +10,10 @@ where
     divwin = 'y'
 group by
     teams.teamid,
+    teamname,
     f.franchname
 order by
     num_wins desc,
     teams.teamid asc,
+    teamname asc,
     f.franchname asc;
