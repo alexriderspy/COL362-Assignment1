@@ -1,0 +1,1 @@
+select people.playerid, namefirst as firstname, namelast as lastname, 
