@@ -6,9 +6,31 @@ select
     count(distinct t.yearid) as num_seasons
 from
     people as p
-    join ((select playerid, yearid from batting) union
-    (select playerid, yearid from pitching) union
-    (select playerid, yearid from fielding)) as t on p.playerid = t.playerid
+    join (
+        (
+            select
+                playerid,
+                yearid
+            from
+                batting
+        )
+        union
+        (
+            select
+                playerid,
+                yearid
+            from
+                pitching
+        )
+        union
+        (
+            select
+                playerid,
+                yearid
+            from
+                fielding
+        )
+    ) as t on p.playerid = t.playerid
 group by
     p.playerid,
     firstname,

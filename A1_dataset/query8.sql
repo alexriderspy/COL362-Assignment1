@@ -33,16 +33,16 @@ from
         select
             distinct teamid,
             name,
-            yearid 
+            yearid
         from
             teams
-    ) as t on t.teamid = salaries.teamid and t.yearid = salaries.yearid 
-    order by
-        t.teamid asc,
-        teamname asc,
-        s.seasonid asc,
-        p.playerid asc,
-        player_firstname asc,
-        player_lastname asc,
-        s.salary desc
-;
+    ) as t on t.teamid = salaries.teamid
+    and t.yearid = salaries.yearid
+order by
+    t.teamid asc,
+    teamname asc,
+    s.seasonid asc,
+    p.playerid asc,
+    player_firstname asc,
+    player_lastname asc,
+    s.salary desc;

@@ -22,7 +22,8 @@ from
                 group by
                     teamid,
                     name
-            ) as t on t.teamid = teams.teamid and t.name = teams.name
+            ) as t on t.teamid = teams.teamid
+            and t.name = teams.name
         where
             t.s >= 20
         order by

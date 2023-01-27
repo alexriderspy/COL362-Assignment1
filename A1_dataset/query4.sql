@@ -2,7 +2,7 @@ select
     people.playerid,
     people.namefirst as firstname,
     people.namelast as lastname,
-    avg(h /ab) as career_batting_average
+    avg(h / ab) as career_batting_average
 from
     batting
     join people on people.playerid = batting.playerid
