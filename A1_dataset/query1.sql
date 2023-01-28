@@ -2,12 +2,11 @@ select
     people.playerid,
     people.namefirst as firstname,
     people.namelast as lastname,
-    count(*) as total_caught_stealing
+    sum(cs) as total_caught_stealing
 from
     batting
     join people on people.playerid = batting.playerid
-where
-    cs = 1
+where cs is not null
 group by
     people.playerid,
     people.namefirst,

@@ -1,29 +1,55 @@
+with b as (
+    select
+        playerid,
+        yearid,
+        sum(ab) as at_bats
+    from
+        batting
+    where
+        ab is not null
+    group by
+        playerid,
+        yearid
+),
+a as (
+    select
+        batting.playerid,
+        batting.yearid,
+        sum(h) * 1.0 / sum(ab) * 1.0 as batting_average
+    from
+        batting
+        join b on b.playerid = batting.playerid
+        and b.yearid = batting.yearid
+    where
+        h is not null
+        and ab is not null
+        and at_bats > 0
+    group by
+        batting.playerid,
+        batting.yearid
+)
 select
-    people.playerid,
+    distinct people.playerid,
     people.namefirst as firstname,
     people.namelast as lastname,
-    avg(h / ab) as career_batting_average
+    avg(batting_average) as career_batting_average
 from
-    batting
-    join people on people.playerid = batting.playerid
+    a
+    join people on people.playerid = a.playerid
     join (
         select
-            people.playerid,
-            count(people.playerid) as cnt
+            playerid,
+            count(distinct yearid) as cnt
         from
             batting
-            join people on people.playerid = batting.playerid
         where
             h is not null
             and ab is not null
         group by
-            people.playerid
+            playerid
     ) as t on t.playerid = people.playerid
 where
-    h is not null
-    and ab is not null
-    and ab > 0
-    and t.cnt >= 10
+    t.cnt >= 10
 group by
     people.playerid,
     firstname,

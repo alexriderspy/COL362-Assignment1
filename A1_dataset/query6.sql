@@ -1,7 +1,7 @@
 select
     distinct teams.teamid,
     teams.name as teamname,
-    f.franchname,
+    f.franchname as franchisename,
     max(w) as num_wins
 from
     teams
