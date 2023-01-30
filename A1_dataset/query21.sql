@@ -103,15 +103,16 @@ g as (
         birthstate
     having
         count(*) <= 1
+) (
+    select
+        player1_id,
+        player2_id,
+        birthcity,
+        birthstate,
+        'both' as role
+    from
+        f
 )
-select
-    player1_id,
-    player2_id,
-    birthcity,
-    birthstate,
-    'both' as role
-from
-    f
 union
 (
     select
