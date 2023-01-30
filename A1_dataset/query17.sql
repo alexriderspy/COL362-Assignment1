@@ -1,78 +1,88 @@
 with a as (
     select
-        distinct ap.playerid
+        ap.playerid
     from
         awardsmanagers am,
         awardsplayers ap
     where
-        ap.playerid = am.playerid
+        am.playerid = ap.playerid
 ),
-b1 as (
-    select
-        distinct awardid,
-        min(yearid) as yr,
-        a.playerid
-    from
-        awardsmanagers,
-        a
-    where
-        a.playerid = awardsmanagers.playerid
-    group by
-        awardid,
-        a.playerid
-),
-c1 as (
-    select
-        distinct playerid,
-        min(awardid) as id,
-        yr
-    from
-        b1
-    group by
-        playerid,
-        yr
-),
-b2 as (
+b as (
     select
         distinct a.playerid,
         awardid,
-        min(yearid) as yr
+        yearid
     from
-        awardsplayers,
+        awardsplayers ap,
         a
     where
-        a.playerid = awardsplayers.playerid
-    group by
-        awardid,
+        a.playerid = ap.playerid
+        and yearid = (
+            select
+                min(yearid)
+            from
+                awardsplayers ap2
+            where
+                ap.playerid = ap2.playerid
+        )
+        and awardid = (
+            select
+                min(awardid)
+            from
+                awardsplayers ap2
+            where
+                ap.playerid = ap2.playerid
+                and ap.yearid = ap2.yearid
+        )
+    order by
         a.playerid
 ),
-c2 as (
+c as (
     select
-        distinct playerid,
-        min(awardid) as id,
-        yr
+        distinct a.playerid,
+        awardid,
+        yearid
     from
-        b2
-    group by
-        playerid,
-        yr
+        awardsmanagers ap,
+        a
+    where
+        a.playerid = ap.playerid
+        and yearid = (
+            select
+                min(yearid)
+            from
+                awardsmanagers ap2
+            where
+                ap.playerid = ap2.playerid
+        )
+        and awardid = (
+            select
+                min(awardid)
+            from
+                awardsmanagers ap2
+            where
+                ap.playerid = ap2.playerid
+                and ap.yearid = ap2.yearid
+        )
+    order by
+        a.playerid
 )
 select
-    distinct c1.playerid,
+    b.playerid,
     namefirst as firstname,
     namelast as lastname,
-    c2.id as playerawardid,
-    c2.yr as playerawardyear,
-    c1.id as managerawardid,
-    c1.yr as managerswardyear
+    b.awardid as playerawardid,
+    b.yearid as playerawardyear,
+    c.awardid as managerawardid,
+    c.yearid as managerawardyear
 from
-    c1,
-    c2,
+    b,
+    c,
     people
 where
-    c1.playerid = c2.playerid
-    and people.playerid = c1.playerid
+    b.playerid = c.playerid
+    and b.playerid = people.playerid
 order by
-    c1.playerid,
+    b.playerid,
     firstname,
     lastname;
