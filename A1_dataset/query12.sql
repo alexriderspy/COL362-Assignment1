@@ -1,5 +1,5 @@
 select
-    people.playerid,
+    distinct people.playerid,
     namefirst as firstname,
     namelast as lastname,
     sum (sv) as career_saves,
