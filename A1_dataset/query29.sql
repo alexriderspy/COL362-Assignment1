@@ -46,7 +46,7 @@ cte as (
         cte.next = edges.win
         and not (edges.win = any (vis))
         and not (cte.next = 'NYA')
-        and depth <= 2
+        --and depth <= 2
 )
 select
     distinct start as teamid,

@@ -8,7 +8,6 @@ with recursive edges as (
 cte as (
     select
         distinct loss as next,
-        ARRAY [win] :: varchar(3)[] as vis,
         1 as depth
     from
         edges
@@ -18,14 +17,24 @@ cte as (
     all
     select
         distinct loss as next,
-        (vis || win) :: varchar(3)[],
         depth + 1
     from
         edges,
         cte
     where
         cte.next = edges.win
-        and not (edges.win = any (vis))
-        and cte.next != 'DET' --and depth <= 2
+        and cte.next != 'DET'
+        and depth <= 2*(
+            select
+                count(*)
+            from
+                edges
+        ) --and depth <= 2
 )
-select count(*) as count from cte where cte.next = 'DET';
+--select * from cte;
+select
+    count(*) as count
+from
+    cte
+where
+    cte.next = 'DET';

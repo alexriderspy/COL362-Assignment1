@@ -46,8 +46,8 @@ edges as (
 ),
 cte as (
     select
-        distinct p2_id as next,
-        ARRAY [p1_id]::varchar(10)[] as vis,
+        p2_id as next,
+        --ARRAY [p1_id]::varchar(10)[] as vis,
         cnt as len,
         1 as depth
     from
@@ -57,17 +57,19 @@ cte as (
     union
     all
     select
-        distinct p2_id,
-        (vis || p1_id)::varchar(10)[],
-        (cnt + len),
-        depth + 1
+        case when p2_id = 'clemero02' and len >= 3 then NULL else  
+        p2_id end,
+        case when p2_id = 'clemero02' and len >= 3 then NULL else  
+        
+        (cnt + len) end,
+        case when p2_id = 'clemero02' and len >= 3 then NULL else  
+        
+        (depth + 1) end
     from
         edges,
         cte
     where
         cte.next = edges.p1_id
-        and not (edges.p1_id = any (vis))
-        and not (cte.next = 'clemero02' and len >= 3)
         --and depth <= 2
 )
 -- select * from edges where (p1_id = 'webbbr01' and p2_id = 'choatra01') or (p1_id = 'choatra01' and p2_id = 'almanca01') or (p1_id = 'webbbr01' and p2_id = 'choatra01') or (p1_id = 'almanca01' and p2_id = 'choatra01') or (p1_id = 'choatra01' and p2_id = 'clemero02');
