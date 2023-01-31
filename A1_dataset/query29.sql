@@ -5,19 +5,38 @@ with recursive edges as (
     from
         seriespost
 ),
+a as (
+    select
+        teamidwinner
+    from
+        seriespost
+    where
+        ties > losses
+    group by
+        teamidwinner
+    having
+        count (distinct yearid) >= 1
+),
 cte as (
     select
-        distinct loss as next,
+        distinct win as start,
+        loss as next,
         ARRAY [win] :: varchar(3) [] as vis,
         1 as depth
     from
         edges
     where
-        win = 'WS1'
+        win in (
+            select
+                *
+            from
+                a
+        )
     union
     all
     select
-        distinct loss as next,
+        distinct start,
+        loss as next,
         (vis || win) :: varchar(3) [],
         depth + 1
     from
@@ -26,39 +45,18 @@ cte as (
     where
         cte.next = edges.win
         and not (edges.win = any (vis))
+        and not (cte.next = 'NYA')
         and depth <= 2
-),
-a as (
-    select
-        teamid,
-        name
-    from
-        teams t1
-    where
-        yearid = (
-            select
-                max(yearid)
-            from
-                teams t2
-            where
-                t1.teamid = t2.teamid
-        )
 )
 select
-    distinct cte.next as teamid,
-    name as teamname,
-    depth as pathlength
+    distinct start as teamid,
+    min(depth) as pathlength
 from
-    cte,
-    a
+    cte
 where
-    a.teamid = cte.next
-    and depth = (
-        select
-            max(depth)
-        from
-            cte
-    )
+    cte.next = 'NYA'
+group by
+    teamid
 order by
     teamid,
-    teamname;
+    pathlength;
