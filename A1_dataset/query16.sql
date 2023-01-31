@@ -25,14 +25,15 @@ b as (
 )
 select
     b.playerid,
-    schoolid as colleges_name,
+    schoolname as colleges_name,
     total_awards
 from
-    b,
-    a
-where
-    a.playerid = b.playerid
+    b
+    left outer join a on a.playerid = b.playerid
+    left outer join schools on a.schoolid = schools.schoolid
 order by
     total_awards desc,
     colleges_name,
-    a.playerid;
+    b.playerid
+limit
+    10;

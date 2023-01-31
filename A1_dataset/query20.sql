@@ -1,11 +1,13 @@
 with a as (
     select
         schoolid,
-        count(distinct playerid)
+        count(distinct playerid) as cnt
     from
         collegeplaying
     group by
         schoolid
+    order by
+        cnt desc
     limit
         5
 )

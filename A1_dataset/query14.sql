@@ -27,6 +27,8 @@ b as (
 select
     awardid,
     b1.playerid,
+    namefirst as firstname,
+    namelast as lastname,
     cnt as num_wins
 from
     b b1

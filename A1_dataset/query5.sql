@@ -2,7 +2,7 @@ select
     p.playerid,
     p.namefirst as firstname,
     p.namelast as lastname,
-    p.birthyear || '-' || p.birthmonth || '-' || p.birthday as date_of_birth,
+    lpad(p.birthyear::text, 2, '0') || '-' || lpad(p.birthmonth::text, 2, '0') || '-' || lpad(p.birthday::text, 2, '0') as date_of_birth,
     count(distinct t.yearid) as num_seasons
 from
     people as p
