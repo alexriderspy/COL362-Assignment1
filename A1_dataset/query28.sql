@@ -7,17 +7,17 @@ with recursive edges as (
 ),
 cte as (
     select
-        loss as next,
+        distinct loss as next,
         ARRAY [win] :: varchar(3) [] as vis,
         1 as depth
     from
         edges
     where
-        win = 'HOU'
+        win = 'WS1'
     union
     all
     select
-        loss as next,
+        distinct loss as next,
         (vis || win) :: varchar(3) [],
         depth + 1
     from
@@ -27,20 +27,38 @@ cte as (
         cte.next = edges.win
         and not (edges.win = any (vis))
         and depth <= 2
-) --select * from cte order by next;
+),
+a as (
+    select
+        teamid,
+        name
+    from
+        teams t1
+    where
+        yearid = (
+            select
+                max(yearid)
+            from
+                teams t2
+            where
+                t1.teamid = t2.teamid
+        )
+)
 select
-    distinct next as teamid,
-    depth as num_hops
+    distinct cte.next as teamid,
+    name as teamname,
+    depth as pathlength
 from
-    cte c1
+    cte,
+    a
 where
-    depth = (
+    a.teamid = cte.next
+    and depth = (
         select
             max(depth)
         from
-            cte c2
-        where
-            c1.next = c2.next
+            cte
     )
 order by
-    teamid;
+    teamid,
+    teamname;

@@ -42,5 +42,6 @@ where
         where
             c1.next = c2.next
     )
+    and c1.next != 'HOU'
 order by
     teamid;
