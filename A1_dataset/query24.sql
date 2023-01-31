@@ -29,12 +29,6 @@ b as (
         and a1.yearid = a2.yearid
         and a1.playerid != a2.playerid
 ),
-nodes as (
-    select
-        distinct playerid
-    from
-        a
-),
 edges as (
     select
         p1_id,

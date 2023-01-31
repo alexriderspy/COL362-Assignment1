@@ -14,7 +14,11 @@ with a as (
 select
     distinct cp.schoolid,
     schoolname,
-    schoolcity || ' ' || schoolstate as schooladdr,
+    case
+        when schoolcity is null
+        or schoolstate is null then null
+        else lpad(p.schoolcity :: text, 2, '0') || ' ' || lpad(p.schoolstate :: text, 2, '0')
+    end as schooladdr,
     cp.playerid,
     namefirst as firstname,
     namelast as lastname

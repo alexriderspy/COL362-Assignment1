@@ -6,7 +6,8 @@ select
 from
     batting
     join people on people.playerid = batting.playerid
-where cs is not null
+where
+    cs is not null
 group by
     people.playerid,
     people.namefirst,

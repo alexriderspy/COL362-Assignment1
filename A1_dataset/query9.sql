@@ -9,12 +9,12 @@ with tmp as (
             from
                 (
                     select
-                        distinct salaries.yearid,
+                        salaries.yearid,
                         salary,
-                        salaries.playerid
+                        salaries.playerid, salaries.teamid, salaries.lgid
                     from
                         salaries
-                        join batting on salaries.playerid = batting.playerid
+                        join batting on salaries.playerid = batting.playerid and salaries.teamid = batting.teamid and salaries.lgid = batting.lgid and salaries.yearid = batting.yearid
                 ) as t1
         ) as p1
     union
@@ -28,12 +28,12 @@ with tmp as (
             from
                 (
                     select
-                        distinct salaries.yearid,
+                        salaries.yearid,
                         salary,
-                        salaries.playerid
+                        salaries.playerid, salaries.teamid, salaries.lgid
                     from
                         salaries
-                        join pitching on salaries.playerid = pitching.playerid
+                        join pitching on salaries.playerid = pitching.playerid and salaries.teamid = pitching.teamid and salaries.lgid = pitching.lgid and salaries.yearid = pitching.yearid
                 ) as t2
         ) as p2
 )

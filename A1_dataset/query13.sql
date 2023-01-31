@@ -235,7 +235,12 @@ select
     p.playerid,
     namefirst as firstname,
     namelast as lastname,
-    birthcity || ' ' || birthstate || ' ' || birthcountry as birth_address,
+    case
+        when birthcity is null
+        or birthstate is null
+        or birthcountry is null then null
+        else lpad(p.birthcity :: text, 2, '0') || ' ' || lpad(p.birthstate :: text, 2, '0') || ' ' || lpad(p.birthcountry :: text, 2, '0')
+    end as birth_address,
     t1_name as first_teamname,
     t2_name as second_teamname
 from
