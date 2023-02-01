@@ -25,8 +25,8 @@ cte as (
         cte
     where
         cte.next = edges.win
-        and not (edges.win = any (vis))
-        --and depth <= 2
+        and not (loss = any (vis))
+        and depth <= 4
 ),
 a as (
     select

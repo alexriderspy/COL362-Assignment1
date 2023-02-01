@@ -16,7 +16,7 @@ with a as(
 ),
 b as (
     select
-        distinct teams.teamid
+        distinct teams.teamid, yearid
     from
         teams
     where
@@ -35,6 +35,7 @@ from
 where
     a.teamid = b.teamid
     and b.teamid = teams.teamid
+    and b.yearid = teams.yearid
     and f.franchid = teams.franchid
 group by
     a.teamid,

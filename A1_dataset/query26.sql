@@ -4,10 +4,12 @@ with recursive edges as (
         teamidloser as loss
     from
         seriespost
+    where yearid >= 1990 and yearid <=2010
 ),
 cte as (
     select
         distinct loss as next,
+        ARRAY [win] :: varchar(3) [] as vis,
         1 as depth
     from
         edges
@@ -17,19 +19,15 @@ cte as (
     all
     select
         distinct loss as next,
+        (vis || win) :: varchar(3) [],
         depth + 1
     from
         edges,
         cte
     where
         cte.next = edges.win
+        and not (loss = any (vis))
         and cte.next != 'DET'
-        and depth <= 2*(
-            select
-                count(*)
-            from
-                edges
-        ) --and depth <= 2
 )
 --select * from cte;
 select

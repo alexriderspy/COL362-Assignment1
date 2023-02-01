@@ -25,7 +25,7 @@ cte as (
         cte
     where
         cte.next = edges.win
-        and not (edges.win = any (vis))
+        and not (loss = any (vis))
         and depth <= 2
 ) --select * from cte order by next;
 select

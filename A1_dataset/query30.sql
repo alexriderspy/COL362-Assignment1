@@ -4,11 +4,12 @@ with recursive edges as (
         teamidloser as loss
     from
         seriespost
+    where yearid >= 1970 and yearid <= 2000
 ),
 cte as (
     select
         distinct loss as next,
-        ARRAY [win] :: varchar(3) [] as vis,
+        ARRAY [] :: varchar(3) [] as vis,
         1 as depth
     from
         edges
@@ -25,25 +26,23 @@ cte as (
         cte
     where
         cte.next = edges.win
-        and not (edges.win = any (vis))
-        and 
+        and not (loss = any (vis)) 
         --and depth <= 2
 )
 select
-    distinct cte.next as teamid,
-    name as teamname,
-    depth as pathlength
+    depth as cyclelength,
+    count(*) as numcycles
 from
-    cte,
-    a
+    cte
 where
-    a.teamid = cte.next
+    cte.next = 'DET'
     and depth = (
         select
             max(depth)
         from
             cte
+        where
+            cte.next = 'DET'
     )
-order by
-    teamid,
-    teamname;
+group by
+    cte.next,cyclelength;
