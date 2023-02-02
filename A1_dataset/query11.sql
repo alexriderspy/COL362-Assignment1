@@ -48,7 +48,7 @@ b as (
         teams.teamid
 )
 select
-    b.teamid,
+    distinct b.teamid,
     name as teamname,
     total_ws_wins
 from

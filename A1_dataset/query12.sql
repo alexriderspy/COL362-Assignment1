@@ -27,7 +27,6 @@ order by
     career_saves desc,
     t.num_seasons desc,
     people.playerid desc,
-    people.playerid asc,
     firstname asc,
     lastname asc
 limit

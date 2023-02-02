@@ -1,6 +1,6 @@
 with a as (
     select
-        playerid
+        distinct playerid
     from
         pitching
     group by
@@ -10,8 +10,7 @@ with a as (
 ),
 b as (
     select
-        p1.playerid,
-        yearid
+        p1.playerid
     from
         a,
         pitching p1
@@ -33,8 +32,7 @@ b as (
 ),
 c as (
     select
-        distinct a.playerid,
-        yearid
+        distinct a.playerid
     from
         a,
         pitching
@@ -79,25 +77,27 @@ e as (
 ),
 f as (
     select
-        playerid,
-        teamid,
-        yearid,
+        e.playerid,
+        e.teamid,
+        e.yearid,
         rank() over (
-            partition by playerid
+            partition by e.playerid
             order by
-                yearid
+                e.yearid,
+                stint
         ) as rank
     from
-        e
+        e, pitching where pitching.playerid = e.playerid and pitching.yearid = e.yearid and pitching.teamid = e.teamid
 ),
 g as (
     select
-        playerid,
+        distinct playerid,
         teamid
     from
         f
     where
         rank <= 2
+    order by playerid
 ),
 h as (
     select
@@ -114,14 +114,21 @@ h as (
 i as (
     select
         distinct b.playerid,
-        b.yearid,
+        yearid,
         teamid
     from
         b,
-        pitching
+        pitching p1
     where
-        b.playerid = pitching.playerid
-        and b.yearid = pitching.yearid
+        b.playerid = p1.playerid
+        and yearid = (
+            select
+                min(yearid)
+            from
+                pitching p2
+            where
+                p1.playerid = p2.playerid
+        )
 ),
 j as (
     select
@@ -232,14 +239,14 @@ p as (
         n.teamid = o.t2
 )
 select
-    p.playerid,
+    distinct p.playerid,
     namefirst as firstname,
     namelast as lastname,
     case
         when birthcity is null
         or birthstate is null
-        or birthcountry is null then null
-        else lpad(p.birthcity :: text, 2, '0') || ' ' || lpad(p.birthstate :: text, 2, '0') || ' ' || lpad(p.birthcountry :: text, 2, '0')
+        or birthcountry is null then ''
+        else birthcity || ' ' || birthstate || ' ' || birthcountry
     end as birth_address,
     t1_name as first_teamname,
     t2_name as second_teamname

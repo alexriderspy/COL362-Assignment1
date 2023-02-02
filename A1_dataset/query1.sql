@@ -1,5 +1,5 @@
 select
-    people.playerid,
+    distinct people.playerid,
     people.namefirst as firstname,
     people.namelast as lastname,
     sum(cs) as total_caught_stealing

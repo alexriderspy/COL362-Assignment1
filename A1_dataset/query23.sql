@@ -1,7 +1,13 @@
 with a as (
     select
         distinct playerid,
-        namefirst || ' ' || namelast as playername
+    case
+        when people.namefirst is null
+        and people.namelast is null then ''
+        when people.namefirst is null then people.namelast
+        when people.namelast is null then people.namefirst
+        else people.namefirst || ' ' || people.namelast
+    end as playername
     from
         people
     where
@@ -12,7 +18,13 @@ with a as (
 b as (
     select
         distinct playerid,
-        namefirst || ' ' || namelast as playername
+    case
+        when people.namefirst is null
+        and people.namelast is null then ''
+        when people.namefirst is null then people.namelast
+        when people.namelast is null then people.namefirst
+        else people.namefirst || ' ' || people.namelast
+    end as playername
     from
         people
     where

@@ -1,6 +1,12 @@
 select
-    people.playerid,
-    people.namefirst || ' ' || people.namelast as playername,
+    distinct people.playerid,
+    case
+        when people.namefirst is null
+        and people.namelast is null then ''
+        when people.namefirst is null then people.namelast
+        when people.namelast is null then people.namefirst
+        else people.namefirst || ' ' || people.namelast
+    end as playername,
     sum(pointsWon) as total_points
 from
     awardsshareplayers
@@ -13,4 +19,4 @@ group by
     people.namelast
 order by
     total_points desc,
-    people.playerid asc;
+    people.playerid;

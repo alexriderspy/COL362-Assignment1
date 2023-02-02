@@ -1,6 +1,12 @@
 select
     distinct people.playerid,
-    namefirst || ' ' || namelast as playername,
+    case
+        when people.namefirst is null
+        and people.namelast is null then ''
+        when people.namefirst is null then people.namelast
+        when people.namelast is null then people.namefirst
+        else people.namefirst || ' ' || people.namelast
+    end as playername,
     count(distinct c2.playerid) as number_of_batchmates
 from
     collegeplaying c1

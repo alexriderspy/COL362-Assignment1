@@ -1,5 +1,5 @@
 select
-    p.playerid,
+    distinct p.playerid,
     p.namefirst as firstname,
     p.namelast as lastname,
     case

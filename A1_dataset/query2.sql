@@ -1,5 +1,5 @@
 select
-    people.playerid,
+    distinct people.playerid,
     people.namefirst as firstname,
     (
         (2 * sum(coalesce(batting.h2b, 0))) + 3 * sum(coalesce(batting.h3b, 0)) + 4 * sum(coalesce(batting.hr, 0))

@@ -24,7 +24,7 @@ b as (
         playerid
 )
 select
-    b.playerid,
+    distinct b.playerid,
     schoolname as colleges_name,
     total_awards
 from

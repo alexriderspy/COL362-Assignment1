@@ -25,7 +25,7 @@ b as (
         )
 )
 select
-    awardid,
+    distinct awardid,
     b1.playerid,
     namefirst as firstname,
     namelast as lastname,

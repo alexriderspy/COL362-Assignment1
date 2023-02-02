@@ -17,7 +17,7 @@ select
     case
         when schoolcity is null
         or schoolstate is null then null
-        else lpad(p.schoolcity :: text, 2, '0') || ' ' || lpad(p.schoolstate :: text, 2, '0')
+        else schoolcity || ' ' || schoolstate
     end as schooladdr,
     cp.playerid,
     namefirst as firstname,

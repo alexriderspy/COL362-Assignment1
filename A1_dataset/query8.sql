@@ -1,5 +1,5 @@
 select
-    t.teamid,
+    distinct t.teamid,
     t.name as teamname,
     s.seasonid,
     p.playerid,

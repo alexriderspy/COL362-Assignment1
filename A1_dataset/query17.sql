@@ -68,7 +68,7 @@ c as (
         a.playerid
 )
 select
-    b.playerid,
+    distinct b.playerid,
     namefirst as firstname,
     namelast as lastname,
     b.awardid as playerawardid,

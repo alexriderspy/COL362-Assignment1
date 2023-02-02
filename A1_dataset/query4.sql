@@ -24,7 +24,7 @@ group by
     people.playerid,
     firstname,
     lastname
-having count(yearid) >= 10
+having count(distinct yearid) >= 10
 order by
     career_batting_average desc,
     people.playerid asc,

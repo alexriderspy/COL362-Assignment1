@@ -1,5 +1,5 @@
 select
-    teamid,
+    distinct teamid,
     name as teamname,
     seasonid,
     winning_percentage

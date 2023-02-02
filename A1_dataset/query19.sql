@@ -1,5 +1,5 @@
 select
-    a.playerid,
+    distinct a.playerid,
     namefirst as firstname,
     namelast as lastname,
     sum(g_all) as G_all,
