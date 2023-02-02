@@ -76,9 +76,9 @@ cte as (
         and not (edges.p2_id = any (vis))
         and not (
             cte.next = 'clemero02'
-            and (cnt + len) >= 3
+            and (len) >= 3
         )
-        --and depth <= 2
+        --and depth <= 1
 )
 select
     True as pathexists

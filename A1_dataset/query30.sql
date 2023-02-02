@@ -4,7 +4,9 @@ with recursive edges as (
         teamidloser as loss
     from
         seriespost
-    where yearid >= 1970 and yearid <= 2000
+    where
+        yearid >= 1970
+        and yearid <= 2000
 ),
 cte as (
     select
@@ -26,23 +28,47 @@ cte as (
         cte
     where
         cte.next = edges.win
-        and not (loss = any (vis)) 
-        --and depth <= 2
+        and not (loss = any (vis))
+        and depth <= 2
 )
 select
-    depth as cyclelength,
-    count(*) as numcycles
-from
-    cte
-where
-    cte.next = 'DET'
-    and depth = (
-        select
-            max(depth)
+    coalesce (
+        (select
+            depth
         from
             cte
         where
             cte.next = 'DET'
-    )
-group by
-    cte.next,cyclelength;
+            and depth = (
+                select
+                    max(depth)
+                from
+                    cte
+                where
+                    cte.next = 'DET'
+            )
+        group by
+            cte.next,
+            depth),
+            0
+    ) as cyclelength,
+    coalesce(
+        (select
+            count(*)
+        from
+            cte
+        where
+            cte.next = 'DET'
+            and depth = (
+                select
+                    max(depth)
+                from
+                    cte
+                where
+                    cte.next = 'DET'
+            )
+        group by
+            cte.next,
+            depth),
+            0
+    ) as numcycles;

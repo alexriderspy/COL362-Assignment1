@@ -29,7 +29,6 @@ cte as (
         and not (loss = any (vis))
         and cte.next != 'DET'
 )
---select * from cte;
 select
     count(*) as count
 from

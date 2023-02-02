@@ -69,7 +69,7 @@ cte as (
         cte.next = edges.p1_id
         and not (edges.p2_id = any (vis))
         and cte.next != 'leagubr01' 
-        --and (cnt+len) <= 3
+        --and (depth) <= 1
 )
 select
     coalesce(

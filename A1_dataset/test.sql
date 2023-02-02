@@ -1,114 +1,74 @@
-with a as (
+with recursive a as (
     select
-        distinct playerid
+        distinct playerid,
+        yearid,
+        teamid
     from
         pitching
-    group by
-        playerid
-    having
-        count(distinct teamid) >= 5
+    union
+    (
+        select
+            distinct playerid,
+            yearid,
+            teamid
+        from
+            allstarfull
+        where
+            gp = 1
+    )
 ),
 b as (
     select
-        distinct p1.playerid
+        a1.playerid as p1_id,
+        a2.playerid as p2_id,
+        a1.teamid,
+        a1.yearid
     from
-        a,
-        pitching p1
-    where
-        a.playerid = p1.playerid
-        and yearid = (
-            select
-                min(yearid)
-            from
-                pitching p2
-            where
-                p1.playerid = p2.playerid
-        )
-    group by
-        p1.playerid,
-        yearid
-    having
-        count(distinct teamid) >= 2
+        a a1
+        join a a2 on a1.teamid = a2.teamid
+        and a1.yearid = a2.yearid
+        and a1.playerid != a2.playerid
 ),
-c as (
+edges as (
     select
-        distinct a.playerid
-    from
-        a,
-        pitching
-    where
-        a.playerid = pitching.playerid
-    except
-    select
-        *
+        p1_id,
+        p2_id,
+        count(*) as cnt
     from
         b
-),
-d as (
-    select
-        distinct c.playerid,
-        teamid
-    from
-        c,
-        pitching
-    where
-        c.playerid = pitching.playerid
-),
-e as (
-    select
-        distinct d.playerid,
-        d.teamid,
-        yearid
-    from
-        d,
-        pitching p1
-    where
-        d.playerid = p1.playerid
-        and d.teamid = p1.teamid
-        and yearid = (
-            select
-                min(yearid)
-            from
-                pitching p2
-            where
-                p1.playerid = p2.playerid
-                and p1.teamid = p2.teamid
-        )
-),
-f as (
-    select
-        e.playerid,
-        e.teamid,
-        e.yearid,
-        rank() over (
-            partition by e.playerid
-            order by
-                e.yearid,
-                stint
-        ) as rank
-    from
-        e, pitching where pitching.playerid = e.playerid and pitching.yearid = e.yearid and pitching.teamid = e.teamid
-),
-g as (
-    select
-        distinct playerid,
-        teamid
-    from
-        f
-    where
-        rank <= 2
-    order by playerid
-),
-h as (
-    select
-        distinct on (g1.playerid) g1.playerid,
-        g1.teamid as t1,
-        g2.teamid as t2
-    from
-        g g1
-        join g g2 on g1.playerid = g2.playerid
-        and g1.teamid != g2.teamid
+    group by
+        p1_id,
+        p2_id
+    having
+        count(*) > 0
     order by
-        g1.playerid
+        p1_id,
+        p2_id
+),
+cte as (
+    select
+        distinct p2_id as next,
+        ARRAY [p1_id] :: varchar(10) [] as vis,
+        cnt as len,
+        1 as depth
+    from
+        edges
+    where
+        p1_id = 'garcifr02'
+    union
+    all
+    select
+        distinct p2_id,
+        (vis || p1_id) :: varchar(10) [],
+        (cnt + len),
+        depth + 1
+    from
+        edges,
+        cte
+    where
+        cte.next = edges.p1_id
+        and not (edges.p2_id = any (vis))
+        and cte.next != 'leagubr01' 
+        and (depth) <= 1
 )
-select * from h; --order by playerid;
+select * from cte;

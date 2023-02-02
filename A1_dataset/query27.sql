@@ -27,7 +27,7 @@ cte as (
         cte.next = edges.win
         and not (loss = any (vis))
         and depth <= 2
-) --select * from cte order by next;
+)
 select
     distinct next as teamid,
     depth as num_hops
@@ -42,6 +42,5 @@ where
         where
             c1.next = c2.next
     )
-    and c1.next != 'HOU'
 order by
     teamid;
