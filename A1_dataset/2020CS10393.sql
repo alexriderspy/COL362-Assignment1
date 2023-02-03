@@ -358,7 +358,7 @@ select
     count(distinct c2.playerid) as number_of_batchmates
 from
     collegeplaying c1
-    join collegeplaying c2 on c1.schoolid = c2.schoolid
+    left outer join collegeplaying c2 on c1.schoolid = c2.schoolid
     and c1.yearid = c2.yearid
     and c1.playerid != c2.playerid
     join people on people.playerid = c1.playerid
@@ -449,7 +449,7 @@ from
     join (
         select
             playerid,
-            count(*) as num_seasons
+            count(distinct yearid) as num_seasons
         from
             pitching
         group by
@@ -1234,7 +1234,7 @@ g as (
         count(*) <= 1
 ) (
     select
-        player1_id,
+        distinct player1_id,
         player2_id,
         birthcity,
         birthstate,
@@ -1245,7 +1245,7 @@ g as (
 union
 (
     select
-        g.player1_id,
+        distinct g.player1_id,
         g.player2_id,
         g.birthcity,
         g.birthstate,
@@ -1293,7 +1293,7 @@ with a as (
         yearid
 )
 select
-    ap1.awardid,
+    distinct ap1.awardid,
     ap1.yearid as seasonid,
     playerid,
     sum(pointswon) as playerpoints,
@@ -1816,9 +1816,6 @@ with recursive edges as (
         teamidloser as loss
     from
         seriespost
-    where
-        yearid >= 1970
-        and yearid <= 2000
 ),
 cte as (
     select

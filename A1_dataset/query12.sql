@@ -10,7 +10,7 @@ from
     join (
         select
             playerid,
-            count(*) as num_seasons
+            count(distinct yearid) as num_seasons
         from
             pitching
         group by
