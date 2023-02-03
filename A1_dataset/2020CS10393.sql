@@ -1,8 +1,8 @@
 --1--
 select
     distinct people.playerid,
-    people.namefirst as firstname,
-    people.namelast as lastname,
+    coalesce(people.namefirst,'') as firstname,
+    coalesce(people.namelast,'') as lastname,
     sum(cs) as total_caught_stealing
 from
     batting
@@ -11,12 +11,12 @@ where
     cs is not null
 group by
     people.playerid,
-    people.namefirst,
-    people.namelast
+    firstname,
+    lastname
 order by
     total_caught_stealing desc,
-    people.namefirst asc,
-    people.namelast asc,
+    firstname asc,
+    lastname asc,
     people.playerid asc
 limit
     10;
@@ -24,7 +24,7 @@ limit
 --2--
 select
     distinct people.playerid,
-    people.namefirst as firstname,
+    coalesce(people.namefirst,'') as firstname,
     (
         (2 * sum(coalesce(batting.h2b, 0))) + 3 * sum(coalesce(batting.h3b, 0)) + 4 * sum(coalesce(batting.hr, 0))
     ) as runscore
@@ -33,10 +33,10 @@ from
     join people on people.playerid = batting.playerid
 group by
     people.playerid,
-    people.namefirst
+    firstname
 order by
     runscore desc,
-    people.namefirst desc,
+    firstname desc,
     people.playerid asc
 limit
     10;
@@ -51,7 +51,7 @@ select
         when people.namelast is null then people.namefirst
         else people.namefirst || ' ' || people.namelast
     end as playername,
-    sum(pointsWon) as total_points
+    sum(coalesce(pointsWon,0)) as total_points
 from
     awardsshareplayers
     join people on people.playerid = awardsshareplayers.playerid
@@ -59,8 +59,7 @@ where
     yearid >= 2000
 group by
     people.playerid,
-    people.namefirst,
-    people.namelast
+    playername
 order by
     total_points desc,
     people.playerid;
@@ -82,8 +81,8 @@ with a as (
 )
 select
     distinct people.playerid,
-    people.namefirst as firstname,
-    people.namelast as lastname,
+    coalesce(people.namefirst,'') as firstname,
+    coalesce(people.namelast,'') as lastname,
     avg(batting_average) as career_batting_average
 from
     a
@@ -104,12 +103,12 @@ limit
 --5--
 select
     distinct p.playerid,
-    p.namefirst as firstname,
-    p.namelast as lastname,
+    coalesce(p.namefirst,'') as firstname,
+    coalesce(p.namelast,'') as lastname,
     case
         when birthyear is null
         or birthmonth is null
-        or birthday is null then null
+        or birthday is null then ''
         else lpad(p.birthyear :: text, 2, '0') || '-' || lpad(p.birthmonth :: text, 2, '0') || '-' || lpad(p.birthday :: text, 2, '0')
     end as date_of_birth,
         count(distinct t.yearid) as num_seasons
@@ -180,8 +179,8 @@ b as (
 select
     distinct a.teamid,
     a.name as teamname,
-    f.franchname as franchisename,
-    max(w) as num_wins
+    coalesce(f.franchname,'') as franchisename,
+    max(coalesce(w,0)) as num_wins
 from
     a,
     b,
@@ -249,15 +248,15 @@ select
     t.name as teamname,
     s.seasonid,
     p.playerid,
-    p.namefirst as player_firstname,
-    p.namelast as player_lastname,
+    coalesce(p.namefirst,'') as player_firstname,
+    coalesce(p.namelast,'') as player_lastname,
     s.salary
 from
     (
         select
             teamid,
             yearid as seasonid,
-            max(salary) as salary
+            max(coalesce(salary,0)) as salary
         from
             salaries
         group by
@@ -364,8 +363,7 @@ from
     join people on people.playerid = c1.playerid
 group by
     people.playerid,
-    namefirst,
-    namelast
+    playername
 order by
     number_of_batchmates desc,
     people.playerid asc;
@@ -439,9 +437,9 @@ limit
 --12--
 select
     distinct people.playerid,
-    namefirst as firstname,
-    namelast as lastname,
-    sum (sv) as career_saves,
+    coalesce(namefirst,'') as firstname,
+    coalesce(namelast,'') as lastname,
+    sum (coalesce(sv,0)) as career_saves,
     t.num_seasons
 from
     pitching
@@ -714,8 +712,8 @@ p as (
 )
 select
     distinct p.playerid,
-    namefirst as firstname,
-    namelast as lastname,
+    coalesce(namefirst,'') as firstname,
+    coalesce(namelast,'') as lastname,
     case
         when birthcity is null
         or birthstate is null
@@ -807,8 +805,8 @@ b as (
 select
     distinct awardid,
     b1.playerid,
-    namefirst as firstname,
-    namelast as lastname,
+    coalesce(namefirst,'') as firstname,
+    coalesce(namelast,'') as lastname,
     cnt as num_wins
 from
     b b1
@@ -848,8 +846,8 @@ select
     name as teamname,
     yearid as seasonid,
     managers.playerid as managerid,
-    namefirst as managerfirstname,
-    namelast as managerlastname
+    coalesce(namefirst,'') as managerfirstname,
+    coalesce(namelast,'') as managerlastname
 from
     managers,
     a,
@@ -899,7 +897,7 @@ b as (
 )
 select
     distinct b.playerid,
-    schoolname as colleges_name,
+    coalesce(schoolname,'') as colleges_name,
     total_awards
 from
     b
@@ -984,8 +982,8 @@ c as (
 )
 select
     distinct b.playerid,
-    namefirst as firstname,
-    namelast as lastname,
+    coalesce(namefirst,'') as firstname,
+    coalesce(namelast,'') as lastname,
     b.awardid as playerawardid,
     b.yearid as playerawardyear,
     c.awardid as managerawardid,
@@ -1016,8 +1014,8 @@ with a as (
 )
 select
     distinct a1.playerid,
-    namefirst as firstname,
-    namelast as lastname,
+    coalesce(namefirst,'') as firstname,
+    coalesce(namelast,'') as lastname,
     num_honored_categories,
     yearid as seasonid
 from
@@ -1049,10 +1047,10 @@ select
     distinct a.playerid,
     namefirst as firstname,
     namelast as lastname,
-    sum(g_all) as G_all,
-    sum(g_1b) as G_1b,
-    sum(g_2b) as G_2b,
-    sum(g_3b) as G_3b
+    sum(coalesce(g_all,0)) as G_all,
+    sum(coalesce(g_1b,0)) as G_1b,
+    sum(coalesce(g_2b,0)) as G_2b,
+    sum(coalesce(g_3b,0)) as G_3b
 from
     appearances a,
     people
@@ -1100,15 +1098,15 @@ with a as (
 )
 select
     distinct cp.schoolid,
-    schoolname,
+    coalesce(schoolname,'') as schoolname,
     case
         when schoolcity is null
-        or schoolstate is null then null
+        or schoolstate is null then ''
         else schoolcity || ' ' || schoolstate
     end as schooladdr,
     cp.playerid,
-    namefirst as firstname,
-    namelast as lastname
+    coalesce(namefirst,'') as firstname,
+    coalesce(namelast,'') as lastname
 from
     collegeplaying cp,
     schools,
@@ -1285,7 +1283,7 @@ with a as (
     select
         awardid,
         yearid,
-        avg(pointswon)
+        avg(coalesce(pointswon,0))
     from
         awardsshareplayers
     group by
@@ -1296,7 +1294,7 @@ select
     distinct ap1.awardid,
     ap1.yearid as seasonid,
     playerid,
-    sum(pointswon) as playerpoints,
+    sum(coalesce(pointswon,0)) as playerpoints,
     avg as averagepoints
 from
     awardsshareplayers ap1,
@@ -1310,7 +1308,7 @@ group by
     playerid,
     avg
 having
-    sum(pointswon) >= avg
+    sum(coalesce(pointswon,0)) >= avg
 order by
     ap1.awardid,
     seasonid,
@@ -1599,7 +1597,6 @@ with recursive edges as (
         teamidloser as loss
     from
         seriespost
-    --where yearid >= 1990 and yearid <=2010
 ),
 cte as (
     select
@@ -1728,14 +1725,15 @@ a as (
 )
 select
     distinct cte.next as teamid,
-    name as teamname,
+    case when name is null then ''
+    else name
+    end
+    as teamname,
     depth as pathlength
 from
-    cte,
-    a
-where
+    cte left outer join a on
     a.teamid = cte.next
-    and depth = (
+    where depth = (
         select
             max(depth)
         from
@@ -1759,7 +1757,7 @@ a as (
     from
         seriespost
     where
-        ties > losses
+        coalesce(ties,0) > coalesce(losses,0)
     group by
         teamidwinner
     having

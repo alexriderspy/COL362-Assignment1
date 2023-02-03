@@ -1,74 +1,62 @@
-with recursive a as (
+with recursive edges as (
     select
-        distinct playerid,
-        yearid,
-        teamid
+        distinct teamidwinner as win,
+        teamidloser as loss
     from
-        pitching
-    union
-    (
-        select
-            distinct playerid,
-            yearid,
-            teamid
-        from
-            allstarfull
-        where
-            gp = 1
-    )
+        seriespost
 ),
-b as (
+a as (
     select
-        a1.playerid as p1_id,
-        a2.playerid as p2_id,
-        a1.teamid,
-        a1.yearid
+        teamidwinner
     from
-        a a1
-        join a a2 on a1.teamid = a2.teamid
-        and a1.yearid = a2.yearid
-        and a1.playerid != a2.playerid
-),
-edges as (
-    select
-        p1_id,
-        p2_id,
-        count(*) as cnt
-    from
-        b
+        seriespost
+    where
+        coalesce(ties,0) > coalesce(losses,0)
     group by
-        p1_id,
-        p2_id
+        teamidwinner
     having
-        count(*) > 0
-    order by
-        p1_id,
-        p2_id
+        count (distinct yearid) >= 1
 ),
 cte as (
     select
-        distinct p2_id as next,
-        ARRAY [p1_id] :: varchar(10) [] as vis,
-        cnt as len,
+        distinct win as start,
+        loss as next,
+        ARRAY [win] :: varchar(3) [] as vis,
         1 as depth
     from
         edges
     where
-        p1_id = 'garcifr02'
+        win in (
+            select
+                *
+            from
+                a
+        )
     union
     all
     select
-        distinct p2_id,
-        (vis || p1_id) :: varchar(10) [],
-        (cnt + len),
+        distinct start,
+        loss as next,
+        (vis || win) :: varchar(3) [],
         depth + 1
     from
         edges,
         cte
     where
-        cte.next = edges.p1_id
-        and not (edges.p2_id = any (vis))
-        and cte.next != 'leagubr01' 
-        and (depth) <= 1
+        cte.next = edges.win
+        and not (loss = any (vis))
+        and not (cte.next = 'NYA')
+        and depth <= 4
 )
-select * from cte;
+select
+    distinct start as teamid,
+    min(depth) as pathlength
+from
+    cte
+where
+    cte.next = 'NYA'
+group by
+    teamid
+order by
+    teamid,
+    pathlength;
