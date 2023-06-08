@@ -1,4 +1,8 @@
-# COL362
+# COL362 - Database management system - Assignment 1
+
+We had to write 30 queries in sql and we had only 1 week time. So it was kind of speed run for all of us.
+
+Instructions to set up postgresql on Linux machines:
 
 sudo su - postgres </br>
 /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data </br>
